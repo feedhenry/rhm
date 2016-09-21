@@ -33,3 +33,5 @@ New commands should go under commands.
     ./rhm 
     run the tests go test ./... 
 ```
+
+More details to come shortly
