@@ -1,0 +1,8 @@
+hash: da964bcd4f9ae62b02b77173159235980d5f94af803ad965a29c7f0cda38b4c0
+updated: 2016-09-21T22:46:11.724076823+01:00
+imports:
+- name: github.com/pkg/errors
+  version: 17b591df37844cde689f4d5813e5cea0927d8dd2
+- name: github.com/urfave/cli
+  version: a14d7d367bc02b1f57d88de97926727f2d936387
+testImports: []
