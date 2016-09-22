@@ -26,7 +26,7 @@ New commands should go under commands.
 ```
     mkdir -p $GOPATH/src/github/feedhenry 
     cd $GOPATH/src/github/feedhenry
-    git clone git@github.com/feedhenry/rhm.git
+    git clone git@github.com:feedhenry/rhm.git
     cd rhm 
     go build .
     //test it works
