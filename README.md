@@ -21,17 +21,16 @@ main //where it all starts
 
 New commands should go under commands.
 
-##Developing
+## Developing
 
 ```
-    mkdir -p $GOPATH/src/github/feedhenry 
-    cd $GOPATH/src/github/feedhenry
-    git clone git@github.com:feedhenry/rhm.git
-    cd rhm 
+    go get github.com/feedhenry/rhm
+    cd $GOPATH/src/github.com/feedhenry/rhm
     go build .
-    //test it works
+    # test it works
     ./rhm 
-    run the tests go test ./... 
+    # run the tests 
+    go test ./... 
 ```
 
 More details to come shortly
