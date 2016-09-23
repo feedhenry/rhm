@@ -94,7 +94,7 @@ func (lc *loginCmd) loginAction(ctx *cli.Context) error {
 		return cli.NewExitError("authentication failed ", 1)
 	}
 	//store our data locally for use with other commands
-	userData := storage.NewUserData(getFeedHenryCookie(res.Cookies()), lc.username, lc.host, domain)
+	userData := storage.NewUserData(getFeedHenryCookie(res.Cookies()), login.UserName, lc.host, domain)
 	if err := lc.store.WriteUserData(userData); err != nil {
 		return cli.NewExitError(err.Error(), 1)
 	}
