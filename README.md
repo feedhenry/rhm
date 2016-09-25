@@ -3,11 +3,23 @@
 
 We are using github.com/urfave/cli to help with the common cli functionality 
 
-structure:
+Propsed structure:
 
 ```
-|--commands
-        |-- get 
+|--commands (main location for all of the domain logic)
+        |-- get (read and list)
+        |   |-- projects
+        |   |-- apps
+        |-- delete 
+        |   |-- projects
+        |   |-- apps
+        |-- update 
+        |   |-- projects
+        |   |-- apps
+        |-- use 
+        |   |-- projects
+        |   |-- apps
+        |-- create 
         |   |-- projects
         |   |-- apps
        login
