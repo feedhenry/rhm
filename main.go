@@ -5,7 +5,9 @@ import (
 
 	"github.com/feedhenry/rhm/commands"
 	"github.com/feedhenry/rhm/commands/get"
+	"github.com/feedhenry/rhm/commands/use"
 	"github.com/feedhenry/rhm/storage"
+
 	"github.com/urfave/cli"
 )
 
@@ -17,7 +19,11 @@ func main() {
 	//create out data store for local file system
 	store := storage.Store{}
 	app.Commands = []cli.Command{
+		//Login
 		commands.NewLoginCmd(os.Stdout, os.Stdin, store),
+		//Use
+		use.NewUseCmd(os.Stdout, os.Stdin, store),
+		//Get
 		get.NewGetCmd(os.Stdout, os.Stdin),
 	}
 	app.Run(os.Args)

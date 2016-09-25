@@ -8,6 +8,7 @@ import (
 
 //NewGetCmd forms the basis of the Get command set
 func NewGetCmd(wr io.Writer, read io.Reader) cli.Command {
+	apps := appsCmd{}
 	return cli.Command{
 		Name:  "get",
 		Usage: "get <resource>",
@@ -16,7 +17,9 @@ func NewGetCmd(wr io.Writer, read io.Reader) cli.Command {
 				Name: "projects",
 			},
 			cli.Command{
-				Name: "apps",
+				Name:   "apps",
+				Usage:  "",
+				Action: apps.appsAction,
 			},
 		},
 	}

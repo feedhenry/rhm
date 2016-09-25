@@ -11,10 +11,11 @@ import (
 
 //UserData represents the current logged in user
 type UserData struct {
-	Auth     string `json:"auth"`
-	Host     string `json:"host"`
-	UserName string `json:"userName"`
-	Domain   string `json:"domain"`
+	Auth          string `json:"auth"`
+	Host          string `json:"host"`
+	UserName      string `json:"userName"`
+	Domain        string `json:"domain"`
+	ActiveProject string `json:"activeProject"` //this is the guid of the project the user is currently working with.
 }
 
 //NewUserData return new UserData
@@ -57,10 +58,22 @@ func getHomeDir() (string, error) {
 	return u.HomeDir, nil
 }
 
+//TODO maybe these should just implemt io.Writer and io.Reader?
+
 //Storer defines a user data store
 type Storer interface {
-	ReadUserData() (*UserData, error)
+	Writer
+	Reader
+}
+
+//Writer is responsible for writing the UserData to the store
+type Writer interface {
 	WriteUserData(ud *UserData) error
+}
+
+//Reader is responsible for reading the UserData to the store
+type Reader interface {
+	ReadUserData() (*UserData, error)
 }
 
 //Store implements the Storer interface
