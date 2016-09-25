@@ -20,11 +20,13 @@ func main() {
 	store := storage.Store{}
 	app.Commands = []cli.Command{
 		//Login
-		commands.NewLoginCmd(os.Stdout, os.Stdin, store),
+		commands.NewLoginCmd(os.Stdin, os.Stdout, store),
+		//Context
+		commands.NewContextCmd(os.Stdin, os.Stdout, store),
 		//Use
 		use.NewUseCmd(os.Stdout, os.Stdin, store),
 		//Get
-		get.NewGetCmd(os.Stdout, os.Stdin),
+		get.NewGetCmd(os.Stdout, os.Stdin, store),
 	}
 	app.Run(os.Args)
 }

@@ -3,11 +3,12 @@ package get
 import (
 	"io"
 
+	"github.com/feedhenry/rhm/storage"
 	"github.com/urfave/cli"
 )
 
 //NewGetCmd forms the basis of the Get command set
-func NewGetCmd(wr io.Writer, read io.Reader) cli.Command {
+func NewGetCmd(in io.Reader, out io.Reader, store storage.Storer) cli.Command {
 	apps := appsCmd{}
 	return cli.Command{
 		Name:  "get",
