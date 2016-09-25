@@ -2,6 +2,7 @@ package commands
 
 import (
 	"bytes"
+	"flag"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -47,6 +48,7 @@ func (ml MockLoginStore) WriteUserData(ud *storage.UserData) error {
 func TestLoginActionOk(t *testing.T) {
 	var reader bytes.Buffer
 	var writer bytes.Buffer
+	var flagSet flag.FlagSet
 	poster := createMockPoster(t, 200, "/box/srv/1.1/act/sys/auth/login", `{"result":"ok"}`)
 	store := MockLoginStore{
 		writeAssert: func(ud *storage.UserData) {
@@ -61,7 +63,10 @@ func TestLoginActionOk(t *testing.T) {
 	lcmd := &loginCmd{out: &writer, in: &reader, host: "http://localhost", poster: poster, store: store}
 	lcmd.username = "test@test.com"
 	lcmd.password = "password"
-	if err := lcmd.loginAction(&cli.Context{}); err != nil {
+	fset := &flagSet
+	fset.Parse([]string{"http://test.test.com"})
+	ctx := cli.NewContext(nil, fset, nil)
+	if err := lcmd.loginAction(ctx); err != nil {
 		t.Fatalf("expected login to succeed %s", err.Error())
 	}
 	if len(writer.Bytes()) > 0 {
@@ -73,12 +78,16 @@ func TestLoginActionOk(t *testing.T) {
 func TestLoginActionFail(t *testing.T) {
 	var reader bytes.Buffer
 	var writer bytes.Buffer
+	var flagSet flag.FlagSet
 	poster := createMockPoster(t, 200, "/box/srv/1.1/act/sys/auth/login", `{"result":"fail"}`)
 	//dont need the store should never get there
 	lcmd := &loginCmd{out: &writer, in: &reader, host: "http://localhost", poster: poster, store: nil}
 	lcmd.username = "test@test.com"
 	lcmd.password = "password"
-	err := lcmd.loginAction(&cli.Context{})
+	fset := &flagSet
+	fset.Parse([]string{"http://test.test.com"})
+	ctx := cli.NewContext(nil, fset, nil)
+	err := lcmd.loginAction(ctx)
 	if err == nil {
 		t.Fatalf("expected login to fail ")
 	}

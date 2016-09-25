@@ -32,14 +32,9 @@ func (lc *loginCmd) Login() cli.Command {
 	return cli.Command{
 		Name:        "login",
 		Action:      lc.loginAction,
-		Usage:       "login",
+		Usage:       "login <full_host>",
 		Description: "login will authenticate you against the <host>. If no host is provided it will attempt to authenticate you against localhost",
 		Flags: []cli.Flag{
-			cli.StringFlag{
-				Name:        "host",
-				Usage:       "full url of the rhmap host",
-				Destination: &lc.host,
-			},
 			cli.StringFlag{
 				Name:        "username",
 				Destination: &lc.username,
@@ -64,6 +59,10 @@ func (lc *loginCmd) loginAction(ctx *cli.Context) error {
 	var (
 		url = "%s/box/srv/1.1/act/sys/auth/login"
 	)
+	if len(ctx.Args()) != 1 {
+		return cli.NewExitError("missing argument: "+ctx.Command.Usage, 1)
+	}
+	lc.host = ctx.Args()[0]
 	login, err := lc.getUsernamePassword()
 	if err != nil {
 		return cli.NewExitError(err.Error(), 1)
