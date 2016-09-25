@@ -15,6 +15,7 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.Name = "rhm"
+	app.Usage = "a simple cli interface for Redhat Mobile Application Platform"
 	app.Version = "0.0.1"
 	//create out data store for local file system
 	store := storage.Store{}
