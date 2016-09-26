@@ -8,7 +8,8 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"time"
+	//"os"
+	"text/template"
 
 	"github.com/feedhenry/rhm/storage"
 	"github.com/urfave/cli"
@@ -19,9 +20,7 @@ type projectCmd struct {
 	out      io.Writer
 	in       io.Reader
 	response func(*http.Request) (*http.Response, error)
-	//response   http.Client
-	newrequest func(string, string, io.Reader) (*http.Request, error)
-	store      storage.Storer
+	store    storage.Storer
 }
 
 //Project Defines our cli command including its flags and usage then returns the command to allow a user to do specific operations on projects
@@ -34,29 +33,23 @@ func (pc *projectCmd) Project() cli.Command {
 	}
 }
 
-//this is the data structure for posting to the server
-type projectParams struct {
-	Domain string `json:"d"`
-}
-
 //projectAction is where the logic is pulled together to perform the command. This funtion conforms to the cli action
 func (pc *projectCmd) projectAction(ctx *cli.Context) error {
 	var (
-		url = "%s/box/api/projects"
+		url = "%s/box/api/projects?apps=false"
 	)
 	userData, err := pc.store.ReadUserData()
 	if err != nil {
 		return cli.NewExitError("could not read userData "+err.Error(), 1)
 	}
 	fullURL := fmt.Sprintf(url, userData.Host)
-	newrequest, err := pc.newrequest("GET", fullURL, nil)
+	newrequest, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
 		return cli.NewExitError("could not create new request object "+err.Error(), 1)
 	}
 
 	// create a cookie
-	expiration := time.Now().Add(365 * 24 * time.Hour)
-	cookie := http.Cookie{Name: "feedhenry", Value: userData.Auth, Expires: expiration}
+	cookie := http.Cookie{Name: "feedhenry", Value: userData.Auth}
 	newrequest.AddCookie(&cookie)
 
 	// do the request :)
@@ -71,15 +64,15 @@ func (pc *projectCmd) projectAction(ctx *cli.Context) error {
 		return cli.NewExitError("project list request failed "+err.Error(), 1)
 	}
 
-	// some juggling with the json return string
-	var resJSON interface{}
+	var resJSON []*Project
 	if err := json.Unmarshal(ret, &resJSON); err != nil {
 		return cli.NewExitError("failed to decode response", 1)
 	}
-	k := resJSON.([]interface{})
-	for _, v := range k {
-		x := v.(map[string]interface{})
-		fmt.Printf("Project %+v\n", x["title"])
+
+	t := template.New("project list template")
+	t, _ = t.Parse("Project : {{.Title}}  Guid : {{.Guid}} \n\n")
+	for _, v := range resJSON {
+		t.Execute(pc.out, v)
 	}
 
 	return nil
@@ -88,6 +81,6 @@ func (pc *projectCmd) projectAction(ctx *cli.Context) error {
 //NewProjectCmd configures the ProjectCmd for use with the client
 func NewProjectCmd(in io.Reader, out io.Writer, store storage.Storer) cli.Command {
 	var client http.Client
-	pc := &projectCmd{out: out, in: in, response: client.Do, newrequest: http.NewRequest, store: store}
+	pc := &projectCmd{out: out, in: in, response: client.Do, store: store}
 	return pc.Project()
 }
