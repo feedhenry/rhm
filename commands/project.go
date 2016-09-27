@@ -8,7 +8,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	//"os"
 	"text/template"
 
 	"github.com/feedhenry/rhm/storage"
@@ -70,9 +69,10 @@ func (pc *projectCmd) projectAction(ctx *cli.Context) error {
 	}
 
 	t := template.New("project list template")
-	t, _ = t.Parse("Project : {{.Title}}  Guid : {{.Guid}} \n\n")
-	for _, v := range resJSON {
-		t.Execute(pc.out, v)
+	t, _ = t.Parse("{{range . }}  Project : {{.Title}}  Guid : {{.Guid}} \n\n  {{end}}")
+
+	if err := t.Execute(pc.out, resJSON); err != nil {
+		return cli.NewExitError("failed to execute template "+err.Error(), 1)
 	}
 
 	return nil
