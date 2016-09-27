@@ -35,9 +35,12 @@ New commands should go under commands.
 
 ## Developing
 
+Install glide first [it's on GitHub](https://github.com/Masterminds/glide)
+
 ```
     go get github.com/feedhenry/rhm
     cd $GOPATH/src/github.com/feedhenry/rhm
+    glide install
     go build .
     # test it works
     ./rhm 
