@@ -61,3 +61,8 @@ func (cc contextCmd) contextAction(ctx *cli.Context) error {
 	}
 	return nil
 }
+
+// ContextProvider defines the relevant context a user can be working in
+type ContextProvider interface {
+	Project() (string, error)
+}

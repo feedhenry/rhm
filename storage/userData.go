@@ -122,3 +122,12 @@ func openUserData() (io.ReadWriteCloser, error) {
 	}
 	return f, nil
 }
+
+// Project returns the current project context (guid), or an error if there is an issue
+func (s Store) Project() (string, error) {
+	user, err := s.ReadUserData()
+	if err != nil {
+		return "", err
+	}
+	return user.ActiveProject, nil
+}

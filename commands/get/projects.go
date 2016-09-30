@@ -60,17 +60,15 @@ func (pc *projectsCmd) projectAction(ctx *cli.Context) error {
 	if err != nil {
 		return cli.NewExitError("failed to read response body "+err.Error(), 1)
 	}
-	//check if not authed)
+	//check if not authed
 	if err := handleProjectsResponseStatus(resp.StatusCode); err != nil {
 		pc.out.Write(ret)
 		return err
 	}
-
 	var resJSON []*commands.Project
 	if err := json.Unmarshal(ret, &resJSON); err != nil {
 		return cli.NewExitError("failed to decode response :"+err.Error(), 1)
 	}
-
 	t := template.New("project list template")
 	t, _ = t.Parse("{{range . }} |  Project | {{.Title}}  | Guid | {{.Guid}} \n\n  {{end}}")
 	if err := t.Execute(pc.out, resJSON); err != nil {
