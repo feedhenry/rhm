@@ -8,20 +8,12 @@ import (
 )
 
 //NewGetCmd forms the basis of the Get command set
-func NewGetCmd(in io.Reader, out io.Reader, store storage.Storer) cli.Command {
-	apps := appsCmd{}
+func NewGetCmd(in io.Reader, out io.Writer, store storage.Storer) cli.Command {
 	return cli.Command{
 		Name:  "get",
 		Usage: "get <resource>",
 		Subcommands: []cli.Command{
-			cli.Command{
-				Name: "projects",
-			},
-			cli.Command{
-				Name:   "apps",
-				Usage:  "",
-				Action: apps.appsAction,
-			},
+			NewProjectsCmd(in, out, store),
 		},
 	}
 }
