@@ -4,5 +4,8 @@ go:
 install:
   - go get -u github.com/golang/lint/golint
   - go get -u golang.org/x/tools/cmd/goimports
+  - go get -v github.com/Masterminds/glide
+  - cd $GOPATH/src/github.com/Masterminds/glide && git checkout bd55e763dbfac7b4684f6f3149bb56bed313175a
+  - glide install
 script:
   - make --keep-going ci
