@@ -7,5 +7,6 @@ install:
   - go get -v github.com/Masterminds/glide
   - cd $GOPATH/src/github.com/Masterminds/glide && git checkout bd55e763dbfac7b4684f6f3149bb56bed313175a
   - glide install
+  - cd $HOME/gopath/src/github.com/feedhenry/rhm
 script:
   - make --keep-going ci
