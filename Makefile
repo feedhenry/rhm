@@ -14,7 +14,7 @@ clean:
 	@-go clean -i
 
 .PHONY: ci
-ci: check-gofmt check-goimports check-golint vet test test-race
+ci: check-gofmt check-golint vet test test-race
 
 # goimports doesn't support the -s flag to simplify code, therefore we use both
 # goimports and gofmt -s.
