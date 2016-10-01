@@ -17,7 +17,7 @@ func NewUseCmd(in io.Reader, out io.Writer, store storage.Storer) cli.Command {
 		Name:        "use",
 		Description: "use certain contexts such as project for other actions",
 		Subcommands: []cli.Command{
-			cli.Command{
+			{
 				Name:        "project",
 				Description: "use a certain project for follow on action",
 				Action:      projectSub.SetProjectAction,
