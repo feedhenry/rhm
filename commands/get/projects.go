@@ -24,17 +24,17 @@ type projectsCmd struct {
 }
 
 //Project Defines our cli command including its flags and usage then returns the command to allow a user to do specific operations on projects
-func (pc *projectsCmd) Project() cli.Command {
+func (pc *projectsCmd) Projects() cli.Command {
 	return cli.Command{
 		Name:        "projects",
-		Action:      pc.projectAction,
+		Action:      pc.projectsAction,
 		Usage:       "project",
 		Description: "projects allows listing projects in rhm",
 	}
 }
 
 //projectAction is where the logic is pulled together to perform the command. This funtion conforms to the cli action
-func (pc *projectsCmd) projectAction(ctx *cli.Context) error {
+func (pc *projectsCmd) projectsAction(ctx *cli.Context) error {
 	var (
 		url = "%s/box/api/projects?apps=false"
 	)
@@ -72,7 +72,7 @@ func (pc *projectsCmd) projectAction(ctx *cli.Context) error {
 	}
 
 	t := template.New("project list template")
-	t, _ = t.Parse("{{range . }} |  Project | {{.Title}}  | Guid | {{.Guid}} \n\n  {{end}}")
+	t, _ = t.Parse("{{range . }} |  Project | {{.Title}}  | GUID | {{.GUID}} \n\n  {{end}}")
 	if err := t.Execute(pc.out, resJSON); err != nil {
 		return cli.NewExitError("failed to execute template "+err.Error(), 1)
 	}
@@ -91,5 +91,5 @@ func handleProjectsResponseStatus(status int) error {
 func NewProjectsCmd(in io.Reader, out io.Writer, store storage.Storer) cli.Command {
 	var client http.Client
 	pc := &projectsCmd{out: out, in: in, getter: client.Do, store: store}
-	return pc.Project()
+	return pc.Projects()
 }
