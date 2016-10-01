@@ -28,7 +28,7 @@ check-goimports:
 
 .PHONY: check-golint
 check-golint:
-	diff <(go vet (go list ./... | grep -v /vendor/)) <(printf "")
+	diff <(golint ./... | grep -v vendor/) <(printf "")
 
 .PHONY: vet
 vet:
