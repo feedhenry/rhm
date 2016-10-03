@@ -32,3 +32,10 @@ type App struct {
 	ScmURL    string `json:"scmUrl"`
 	Title     string `json:"title"`
 }
+
+// Template defines the project template response object
+type Template struct {
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Category string `json:"category"`
+}
