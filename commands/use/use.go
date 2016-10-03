@@ -19,7 +19,8 @@ func NewUseCmd(in io.Reader, out io.Writer, store storage.Storer) cli.Command {
 		Subcommands: []cli.Command{
 			{
 				Name:        "project",
-				Description: "use a certain project for follow on action",
+				Usage:       "<guid>",
+				Description: "use a specified project for all following project actions",
 				Action:      projectSub.SetProjectAction,
 			},
 		},

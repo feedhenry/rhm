@@ -39,10 +39,10 @@ func (cc contextCmd) contextCmd() cli.Command {
 //this is the template for outputting the context with
 
 var contextTemplate = `
-| Domain  : {{.Domain}} 
-| Host    : {{.Host}}   
-| User    : {{.UserName}}
-| Project : {{.ActiveProject}}
+| Domain  | {{.Domain}} 
+| Host    | {{.Host}}   
+| User    | {{.UserName}}
+| Project | {{.ActiveProject}}
 `
 
 //main handler for the command

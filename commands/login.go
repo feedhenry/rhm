@@ -38,10 +38,12 @@ func (lc *loginCmd) Login() cli.Command {
 			cli.StringFlag{
 				Name:        "username",
 				Destination: &lc.username,
+				Usage:       "set username from cli  --username=<test@test.com>",
 			},
 			cli.StringFlag{
 				Name:        "password",
 				Destination: &lc.password,
+				Usage:       "set password from cli  --password=<mypass>",
 			},
 		},
 	}
