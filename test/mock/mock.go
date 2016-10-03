@@ -41,7 +41,7 @@ func UserDataStore(toReturn *storage.UserData) Store {
 	return Store{Data: toReturn}
 }
 
-// CreateMockProjectGetter returns a mocked request
+// CreateRequest returns a mocked request
 func CreateRequest(t *testing.T, responseStatus int, path, response string) func(*http.Request) (*http.Response, error) {
 	return func(res *http.Request) (*http.Response, error) {
 		if res.URL.Path != path {
