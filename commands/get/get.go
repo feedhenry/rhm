@@ -14,6 +14,7 @@ func NewGetCmd(in io.Reader, out io.Writer, store storage.Storer) cli.Command {
 		Usage: "get <resource>",
 		Subcommands: []cli.Command{
 			NewProjectsCmd(in, out, store),
+			NewProjectCmd(in, out, store),
 		},
 	}
 }

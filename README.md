@@ -48,4 +48,13 @@ Install glide first [it's on GitHub](https://github.com/Masterminds/glide)
     go test ./... 
 ```
 
-More details to come shortly
+## Building 
+
+You can run ```make ci``` to run a full build or you can run ```make test``` just to run the tests.
+
+## Releasing
+
+There is a release target in the make file. Before releasing ensure you update the version in the Makefile then run 
+```
+make release
+```
