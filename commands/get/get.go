@@ -15,6 +15,8 @@ func NewGetCmd(in io.Reader, out io.Writer, store storage.Storer) cli.Command {
 		Subcommands: []cli.Command{
 			NewProjectsCmd(in, out, store),
 			NewProjectCmd(in, out, store),
+			NewTemplatesCmd(in, out, store),
+			NewEnvironmentsCmd(in, out, store),
 		},
 	}
 }
