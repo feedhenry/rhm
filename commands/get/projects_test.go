@@ -20,7 +20,7 @@ func TestProjectsAction(t *testing.T) {
 		in:     &in,
 		out:    &out,
 		store:  mockStore,
-		getter: mock.CreateMockProjectGetter(t, 200, "testing.feedhenry.me/box/api/projects", response),
+		getter: mock.CreateRequest(t, 200, "testing.feedhenry.me/box/api/projects", response),
 	}
 	if err := pCmd.projectsAction(nil); err != nil {
 		t.Fatal("failed to exectute projects cmd" + err.Error())
@@ -45,7 +45,7 @@ func TestProjectsAction401Error(t *testing.T) {
 		in:     &in,
 		out:    &out,
 		store:  mockStore,
-		getter: mock.CreateMockProjectGetter(t, 401, "testing.feedhenry.me/box/api/projects", response),
+		getter: mock.CreateRequest(t, 401, "testing.feedhenry.me/box/api/projects", response),
 	}
 	if err := pCmd.projectsAction(nil); err == nil {
 		t.Fatal("expected an error executing command")
@@ -63,7 +63,7 @@ func TestProjectsAction500Error(t *testing.T) {
 		in:     &in,
 		out:    &out,
 		store:  mockStore,
-		getter: mock.CreateMockProjectGetter(t, 500, "testing.feedhenry.me/box/api/projects", response),
+		getter: mock.CreateRequest(t, 500, "testing.feedhenry.me/box/api/projects", response),
 	}
 	if err := pCmd.projectsAction(nil); err == nil {
 		t.Fatal("expected an error executing command ")

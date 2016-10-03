@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/feedhenry/rhm/commands"
+	"github.com/feedhenry/rhm/commands/delete"
 	"github.com/feedhenry/rhm/commands/get"
 	"github.com/feedhenry/rhm/commands/use"
 	"github.com/feedhenry/rhm/storage"
@@ -28,6 +29,8 @@ func main() {
 		use.NewUseCmd(os.Stdout, os.Stdin, store),
 		//Get
 		get.NewGetCmd(os.Stdout, os.Stdin, store),
+		//delete
+		delete.NewDeleteCmd(os.Stdin, os.Stdout, store),
 	}
 	app.Run(os.Args)
 }
