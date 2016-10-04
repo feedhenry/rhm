@@ -41,11 +41,11 @@ func UserDataStore(toReturn *storage.UserData) Store {
 	return Store{Data: toReturn}
 }
 
-// CreateMockProjectGetter returns a mocked get request
-func CreateMockProjectGetter(t *testing.T, responseStatus int, path, response string) func(*http.Request) (*http.Response, error) {
+// CreateRequest returns a mocked request
+func CreateRequest(t *testing.T, responseStatus int, path, response string) func(*http.Request) (*http.Response, error) {
 	return func(res *http.Request) (*http.Response, error) {
 		if res.URL.Path != path {
-			t.Fatal("incorrect api path "+res.URL.Path, res.URL.Path)
+			t.Fatal("incorrect api path "+res.URL.Path, path)
 		}
 		bodyRC := ioutil.NopCloser(bytes.NewReader([]byte(response)))
 		resp := &http.Response{StatusCode: responseStatus, Body: bodyRC, Header: http.Header{}}

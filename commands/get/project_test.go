@@ -16,7 +16,7 @@ func TestProjectAction(t *testing.T) {
 	)
 	t.Run("200ok", func(t *testing.T) {
 		mockResponse := `{"title": "cordova-test", "guid": "scqswfv56m7fktyijkfw6tkd"}`
-		getter := mock.CreateMockProjectGetter(t, 200, "testing.feedhenry.me/box/api/projects/scqswfv56m7fktyijkfw6tkd", mockResponse)
+		getter := mock.CreateRequest(t, 200, "testing.feedhenry.me/box/api/projects/scqswfv56m7fktyijkfw6tkd", mockResponse)
 		pCommand := projectCmd{
 			in:      &in,
 			out:     &out,
@@ -35,7 +35,7 @@ func TestProjectAction(t *testing.T) {
 
 	t.Run("500fail", func(t *testing.T) {
 		mockResponse := `{"status": "error", "message": "unexpected error"}`
-		getter := mock.CreateMockProjectGetter(t, 500, "testing.feedhenry.me/box/api/projects/scqswfv56m7fktyijkfw6tkd", mockResponse)
+		getter := mock.CreateRequest(t, 500, "testing.feedhenry.me/box/api/projects/scqswfv56m7fktyijkfw6tkd", mockResponse)
 		pCommand := projectCmd{
 			in:      &in,
 			out:     &out,
@@ -50,7 +50,7 @@ func TestProjectAction(t *testing.T) {
 
 	t.Run("401", func(t *testing.T) {
 		mockResponse := `{"status": "error", "message": "unexpected error"}`
-		getter := mock.CreateMockProjectGetter(t, 401, "testing.feedhenry.me/box/api/projects/scqswfv56m7fktyijkfw6tkd", mockResponse)
+		getter := mock.CreateRequest(t, 401, "testing.feedhenry.me/box/api/projects/scqswfv56m7fktyijkfw6tkd", mockResponse)
 		pCommand := projectCmd{
 			in:      &in,
 			out:     &out,
