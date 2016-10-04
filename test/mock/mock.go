@@ -52,3 +52,15 @@ func CreateMockProjectGetter(t *testing.T, responseStatus int, path, response st
 		return resp, nil
 	}
 }
+
+// CreateMockProjectCreate returns a mocked get request
+func CreateMockProjectCreate(t *testing.T, responseStatus int, path, response string) func(*http.Request) (*http.Response, error) {
+	return func(res *http.Request) (*http.Response, error) {
+		if res.URL.Path != path {
+			t.Fatal("incorrect api path "+res.URL.Path, res.URL.Path)
+		}
+		bodyRC := ioutil.NopCloser(bytes.NewReader([]byte(response)))
+		resp := &http.Response{StatusCode: responseStatus, Body: bodyRC, Header: http.Header{}}
+		return resp, nil
+	}
+}

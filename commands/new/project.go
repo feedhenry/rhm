@@ -33,12 +33,13 @@ var projectTemplate = `
         {{end}}        
 `
 
-type projectsCmd struct {
-	out      io.Writer
-	in       io.Reader
-	store    storage.Storer
-	title    string
-	template string
+type projectCmd struct {
+	out        io.Writer
+	in         io.Reader
+	store      storage.Storer
+	httpClient func(*http.Request) (*http.Response, error)
+	title      string
+	template   string
 }
 
 //this is the data structure for posting to the server
@@ -49,14 +50,16 @@ type projectParams struct {
 
 // ProjectCreateCmd - creates command
 func ProjectCreateCmd(in io.Reader, out io.Writer, store storage.Storer) cli.Command {
-	pc := &projectsCmd{out: out, in: in, store: store}
+	var client http.Client
+	pc := &projectCmd{out: out, in: in, store: store, httpClient: client.Do}
 	return pc.Project()
 }
 
-func (pc *projectsCmd) Project() cli.Command {
+func (pc *projectCmd) Project() cli.Command {
 	return cli.Command{
 		Name:        "project",
 		Action:      pc.projectAction,
+		Usage:       "new project",
 		Description: "Create new project",
 		Flags: []cli.Flag{
 			cli.StringFlag{
@@ -73,7 +76,7 @@ func (pc *projectsCmd) Project() cli.Command {
 	}
 }
 
-func (pc *projectsCmd) projectAction(ctx *cli.Context) error {
+func (pc *projectCmd) projectAction(ctx *cli.Context) error {
 	var (
 		url = "%s/box/api/projects"
 	)
@@ -88,14 +91,13 @@ func (pc *projectsCmd) projectAction(ctx *cli.Context) error {
 	if err != nil {
 		return cli.NewExitError("could not create new request object "+err.Error(), 1)
 	}
-	newrequest.Header.Set("Content-Type", "application/json")
+	//newrequest.Header.Set("Content-Type", "application/json")
 	cookie := http.Cookie{Name: "feedhenry", Value: userData.Auth}
 	newrequest.AddCookie(&cookie)
 	if err != nil {
 		return cli.NewExitError(err.Error(), 1)
 	}
-	client := http.Client{}
-	resp, err := client.Do(newrequest)
+	resp, err := pc.httpClient(newrequest)
 	if err != nil {
 		return cli.NewExitError("could not create new request object "+err.Error(), 1)
 	}
@@ -128,7 +130,7 @@ func handleProjectsResponseStatus(status int) error {
 	return cli.NewExitError(fmt.Sprintf("\n response %d \n", status), 1)
 }
 
-func (pc *projectsCmd) createRequestBody() (projectParams, error) {
+func (pc *projectCmd) createRequestBody() (projectParams, error) {
 	body := projectParams{}
 	if pc.title == "" {
 		title, err := ui.WaitForAnswer("Enter project name", pc.out, pc.in)
