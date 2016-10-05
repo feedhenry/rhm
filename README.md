@@ -35,6 +35,8 @@ New commands should go under commands.
 
 ## Developing
 
+Ensure you are running go 1.7 or later.
+
 Install glide first [it's on GitHub](https://github.com/Masterminds/glide)
 
 ```
