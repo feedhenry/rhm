@@ -15,7 +15,7 @@ func TestEnvironmentsAction(t *testing.T) {
 		in        bytes.Buffer
 		out       bytes.Buffer
 	)
-	response := `[{"title": "cordova-test", "guid": "scqswfv56m7fktyijkfw6tkd"}]`
+	response := `[{"id": "some-env", "label": "some-env-do-not-delete" , "target" : {"id" : "targetId" , "label": "targetLabel"} }]`
 	eCmd := &environmentsCmd{
 		in:     &in,
 		out:    &out,
@@ -26,11 +26,17 @@ func TestEnvironmentsAction(t *testing.T) {
 		t.Fatal("failed to exectute environments cmd" + err.Error())
 	}
 	content := string(out.Bytes())
-	if !strings.Contains(content, "cordova-test") {
-		t.Fatal("expected the environment title to be present")
+	if !strings.Contains(content, "some-env") {
+		t.Fatal("expected the environment id to be present")
 	}
-	if !strings.Contains(content, "scqswfv56m7fktyijkfw6tkd") {
-		t.Fatal("expected the environment guid to be present")
+	if !strings.Contains(content, "some-env-do-not-delete") {
+		t.Fatal("expected the environment label to be present")
+	}
+	if !strings.Contains(content, "targetId") {
+		t.Fatal("expected the environment target id to be present")
+	}
+	if !strings.Contains(content, "targetLabel") {
+		t.Fatal("expected the environment target label to be present")
 	}
 }
 

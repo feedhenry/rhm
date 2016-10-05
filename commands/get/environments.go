@@ -64,9 +64,9 @@ func (ec *environmentsCmd) environmentsAction(ctx *cli.Context) error {
 		return cli.NewExitError("could not create new request object "+err.Error(), 1)
 	}
 
-	// create a cookie
-	//cookieFeedhenry := http.Cookie{Name: "feedhenry", Value: userData.Auth}
-	//newrequest.AddCookie(&cookieFeedhenry)
+	// Use the fh-mbass-api-key
+	// I have hardcoded this for now - not ideal
+	// Looking into doing a query to get this key
 
 	newrequest.Header.Add("X-FH-AUTH-USER", "9052dfadcf8994d997e6d1fa7c395d760e448312")
 

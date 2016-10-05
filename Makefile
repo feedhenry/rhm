@@ -37,7 +37,7 @@ test:
 
 .PHONY: test-race
 test-race:
-    go test -v -cpu=1,2,4 -short -race `go list ./... | grep -v /vendor/`
+	go test -v -cpu=1,2,4 -short -race `go list ./... | grep -v /vendor/`
 
 .PHONY: test-with-vendor 
 test-with-vendor:
