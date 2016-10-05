@@ -29,3 +29,5 @@ _testmain.go
 
 # Binaries
 rhm
+
+.DS_Store
