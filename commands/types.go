@@ -39,3 +39,41 @@ type Template struct {
 	Name     string `json:"name"`
 	Category string `json:"category"`
 }
+
+// ProjectTemplate defines the project template response object
+type ProjectTemplate struct {
+	ID       string `json:"id"`
+	Title    string `json:"name"`
+	Category string `json:"category"`
+}
+
+// Environment defines the environments response object
+type Environment struct {
+	ID      string  `json:"id"`
+	Label   string  `json:"label"`
+	Token   string  `json:"token"`
+	Domain  string  `json:"domain"`
+	UID     string  `json:"uid"`
+	Enabled bool    `json:"enabled"`
+	Target  *Target `json:"target,omitempty"`
+}
+
+// Target MBaaS
+type Target struct {
+	ID          string `json:"id"`
+	Domain      string `json:"domain"`
+	Owner       string `json:"owner"`
+	FhMbaasHost string `json:"fhMbaasHost"`
+	Label       string `json:"label"`
+	URL         string `json:"url"`
+	RouterDNS   string `json:"routerDns"`
+	BearerToken string `json:"bearerToken"`
+	ServiceKey  string `json:"servicekey"`
+	NagiosURL   string `json:"nagiosUrl"`
+	Decoupled   bool   `json:"decoupled"`
+	Editable    bool   `json:"editable"`
+	Enabled     bool   `json:"enabled"`
+	Type        string `json:"type"`
+	Env         string `json:"_env"`
+	Description string `json:"_label"`
+}
