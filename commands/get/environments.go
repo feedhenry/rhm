@@ -64,21 +64,20 @@ func (ec *environmentsCmd) environmentsAction(ctx *cli.Context) error {
 		return cli.NewExitError("could not create new request object "+err.Error(), 1)
 	}
 
-	// Use the fh-mbass-api-key
-	// I have hardcoded this for now - not ideal
-	// Looking into doing a query to get this key
+	// This ensures that millicore proceeds with the userData.Auth setting
+	newrequest.Header.Set("User-Agent", "FHC/Client")
 
-	newrequest.Header.Add("X-FH-AUTH-USER", "9052dfadcf8994d997e6d1fa7c395d760e448312")
+	// create a cookie
+	cookie := http.Cookie{Name: "feedhenry", Value: userData.Auth}
+	newrequest.AddCookie(&cookie)
 
 	// do request
 	resp, err := ec.getter(newrequest)
-
 	if err != nil {
 		return cli.NewExitError("could not create new request object "+err.Error(), 1)
 	}
 	defer resp.Body.Close()
 	ret, err := ioutil.ReadAll(resp.Body)
-
 	if err != nil {
 		return cli.NewExitError("failed to read response body "+err.Error(), 1)
 	}
@@ -89,14 +88,12 @@ func (ec *environmentsCmd) environmentsAction(ctx *cli.Context) error {
 	}
 
 	var resJSON []*commands.Environment
-
 	if err := json.Unmarshal(ret, &resJSON); err != nil {
 		return cli.NewExitError("failed to decode response :"+err.Error(), 1)
 	}
 
 	t := template.New("Environments")
 	t, err = t.Parse(environmentListTemplate)
-	//t, _ = t.Parse("{{range . }}Id | {{.ID}} \nLabel | {{ .Label}} \nToken | {{ .Token}} \n\n\t-- Target ID | {{ .Target.ID}} \n\t-- Target Label | {{ .Target.Label}} \n\t-- Target MBaaS Host | {{ .Target.FhMbaasHost}} \n\t-- Target Env | {{ .Target.Env}} \n\n\n{{end}}")
 	if err := t.Execute(ec.out, resJSON); err != nil {
 		return cli.NewExitError("failed to execute template "+err.Error(), 1)
 	}
