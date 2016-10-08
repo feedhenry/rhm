@@ -99,13 +99,10 @@ func (lc *loginCmd) loginAction(ctx *cli.Context) error {
 	if err := lc.store.WriteUserData(userData); err != nil {
 		return cli.NewExitError(err.Error(), 1)
 	}
+	outPuter := ui.NewOutPutter(res.Body, lc.out)
 	if "json" == ctx.GlobalString("o") {
-		encoder := json.NewEncoder(lc.out)
-		if err := encoder.Encode(resJSON); err != nil {
-			return cli.NewExitError(err.Error(), 1)
-		}
+		return outPuter.OutputJSON()
 	}
-
 	return nil
 }
 
