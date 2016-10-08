@@ -12,12 +12,21 @@ import (
 	"github.com/urfave/cli"
 )
 
+var outPutType string
+
 //Note are using github.com/urfave/cli to do some common cli work
 func main() {
 	app := cli.NewApp()
 	app.Name = "rhm"
 	app.Usage = "a simple cli interface for Redhat Mobile Application Platform"
 	app.Version = "0.0.1"
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:        "o",
+			Destination: &outPutType,
+			Usage:       "-o=json",
+		},
+	}
 	//create out data store for local file system
 	store := storage.Store{}
 	app.Commands = []cli.Command{

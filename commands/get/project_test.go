@@ -2,11 +2,13 @@ package get
 
 import (
 	"bytes"
+	"flag"
 	"strings"
 	"testing"
 
 	"github.com/feedhenry/rhm/storage"
 	"github.com/feedhenry/rhm/test/mock"
+	"github.com/urfave/cli"
 )
 
 func TestProjectAction(t *testing.T) {
@@ -14,6 +16,9 @@ func TestProjectAction(t *testing.T) {
 		in, out   bytes.Buffer
 		mockStore = mock.UserDataStore(storage.NewUserData("test", "test@test.com", "testing.feedhenry.me", "testing"))
 	)
+	//setup the flags to be passed through
+	fSet := new(flag.FlagSet)
+	ctx := cli.NewContext(nil, fSet, nil)
 	t.Run("200ok", func(t *testing.T) {
 		mockResponse := `{"title": "cordova-test", "guid": "scqswfv56m7fktyijkfw6tkd"}`
 		getter := mock.CreateRequest(t, 200, "testing.feedhenry.me/box/api/projects/scqswfv56m7fktyijkfw6tkd", mockResponse)
@@ -24,7 +29,8 @@ func TestProjectAction(t *testing.T) {
 			getter:  getter,
 			project: "scqswfv56m7fktyijkfw6tkd",
 		}
-		if err := pCommand.projectAction(nil); err != nil {
+
+		if err := pCommand.projectAction(ctx); err != nil {
 			t.Fatal("did not expect an error ", err.Error())
 		}
 		content := string(out.Bytes())
@@ -43,7 +49,7 @@ func TestProjectAction(t *testing.T) {
 			getter:  getter,
 			project: "scqswfv56m7fktyijkfw6tkd",
 		}
-		if err := pCommand.projectAction(nil); err == nil {
+		if err := pCommand.projectAction(ctx); err == nil {
 			t.Fatal("expected an error ", err.Error())
 		}
 	})
@@ -58,7 +64,7 @@ func TestProjectAction(t *testing.T) {
 			getter:  getter,
 			project: "scqswfv56m7fktyijkfw6tkd",
 		}
-		if err := pCommand.projectAction(nil); err == nil {
+		if err := pCommand.projectAction(ctx); err == nil {
 			t.Fatal("expected an error ", err.Error())
 		}
 	})

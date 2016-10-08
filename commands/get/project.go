@@ -93,6 +93,7 @@ func (pc *projectCmd) projectAction(ctx *cli.Context) error {
 	if err != nil {
 		return cli.NewExitError("failed to parse template "+err.Error(), 1)
 	}
+	//template, writer
 	if err := t.Execute(pc.out, projectModel); err != nil {
 		return cli.NewExitError("failed to output template "+err.Error(), 1)
 	}
