@@ -99,6 +99,10 @@ func (lc *loginCmd) loginAction(ctx *cli.Context) error {
 	if err := lc.store.WriteUserData(userData); err != nil {
 		return cli.NewExitError(err.Error(), 1)
 	}
+	outPuter := ui.NewOutPutter(res.Body, lc.out)
+	if "json" == ctx.GlobalString("o") {
+		return outPuter.OutputJSON()
+	}
 	return nil
 }
 

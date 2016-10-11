@@ -3,17 +3,17 @@ package get
 //handle the project list for rhmap.
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
-	"text/template"
 
 	"github.com/feedhenry/rhm/commands"
 	"github.com/feedhenry/rhm/storage"
+	"github.com/feedhenry/rhm/ui"
 	"github.com/urfave/cli"
 )
+
+var projectsTemplate = "{{range . }} |  Project | {{.Title}}  | GUID | {{.GUID}} \n\n  {{end}}"
 
 //projectsCmd constructs the required writer in order to send the response to the right place.
 type projectsCmd struct {
@@ -55,29 +55,20 @@ func (pc *projectsCmd) projectsAction(ctx *cli.Context) error {
 	if err != nil {
 		return cli.NewExitError("could not create new request object "+err.Error(), 1)
 	}
-	defer resp.Body.Close()
-	ret, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return cli.NewExitError("failed to read response body "+err.Error(), 1)
-	}
+	op := ui.NewOutPutter(resp.Body, pc.out)
 	//check if not authed)
 	if err := handleProjectsResponseStatus(resp.StatusCode); err != nil {
-		pc.out.Write(ret)
+		op.OutputJSON()
 		return err
 	}
-
+	//handle Output
 	var resJSON []*commands.Project
-	if err := json.Unmarshal(ret, &resJSON); err != nil {
-		return cli.NewExitError("failed to decode response :"+err.Error(), 1)
+	switch ctx.GlobalString("o") {
+	case "json":
+		return op.OutputJSON()
+	default:
+		return op.OutputTemplate(projectsTemplate, &resJSON)
 	}
-
-	t := template.New("project list template")
-	t, _ = t.Parse("{{range . }} |  Project | {{.Title}}  | GUID | {{.GUID}} \n\n  {{end}}")
-	if err := t.Execute(pc.out, resJSON); err != nil {
-		return cli.NewExitError("failed to execute template "+err.Error(), 1)
-	}
-
-	return nil
 }
 
 func handleProjectsResponseStatus(status int) error {
