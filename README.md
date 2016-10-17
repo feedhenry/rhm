@@ -38,14 +38,17 @@ New commands should go under commands.
 Ensure you are running go 1.7 or later.
 
 Install glide first [it's on GitHub](https://github.com/Masterminds/glide)
+```
+go get github.com/Masterminds/glide
+```
 
 ```
     go get github.com/feedhenry/rhm
     cd $GOPATH/src/github.com/feedhenry/rhm
     glide install
-    go build .
+    go install
     # test it works
-    ./rhm 
+    rhm 
     # run the tests 
     go test ./... 
 ```
