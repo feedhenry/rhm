@@ -3,15 +3,13 @@ package get
 //handle the environments list for rhmap.
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
-	"text/template"
 
 	"github.com/feedhenry/rhm/commands"
 	"github.com/feedhenry/rhm/storage"
+	"github.com/feedhenry/rhm/ui"
 	"github.com/urfave/cli"
 )
 
@@ -72,32 +70,21 @@ func (ec *environmentsCmd) environmentsAction(ctx *cli.Context) error {
 	newrequest.AddCookie(&cookie)
 
 	// do request
-	resp, err := ec.getter(newrequest)
+	res, err := ec.getter(newrequest)
 	if err != nil {
 		return cli.NewExitError("could not create new request object "+err.Error(), 1)
 	}
-	defer resp.Body.Close()
-	ret, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return cli.NewExitError("failed to read response body "+err.Error(), 1)
-	}
-	// check if not authed)
-	if err := handleEnvironmentsResponseStatus(resp.StatusCode); err != nil {
-		ec.out.Write(ret)
-		return err
-	}
+	defer res.Body.Close()
 
-	var resJSON []*commands.Environment
-	if err := json.Unmarshal(ret, &resJSON); err != nil {
-		return cli.NewExitError("failed to decode response :"+err.Error(), 1)
+	op := ui.NewOutPutter(res.Body, ec.out)
+	//handle Output
+	switch ctx.GlobalString("o") {
+	case "json":
+		return op.OutputJSON()
+	default:
+		var environmentsModel []*commands.Environment
+		return op.OutputTemplate(environmentListTemplate, &environmentsModel)
 	}
-
-	t := template.New("Environments")
-	t, err = t.Parse(environmentListTemplate)
-	if err := t.Execute(ec.out, resJSON); err != nil {
-		return cli.NewExitError("failed to execute template "+err.Error(), 1)
-	}
-
 	return nil
 }
 

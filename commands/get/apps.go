@@ -9,6 +9,12 @@ import (
 type appsCmd struct{}
 
 func (ac appsCmd) appsAction(ctx *cli.Context) error {
-	fmt.Println("here")
+	switch ctx.GlobalString("o") {
+	case "json":
+		fmt.Println("{msg: \"here\"}")
+	default:
+		fmt.Println("here")
+	}
+
 	return nil
 }

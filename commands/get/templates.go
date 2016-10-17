@@ -1,16 +1,13 @@
 package get
 
 import (
-	"encoding/json"
 	"fmt"
-	"html/template"
 	"io"
-	"io/ioutil"
 	"net/http"
-	"strings"
 
 	"github.com/feedhenry/rhm/commands"
 	"github.com/feedhenry/rhm/storage"
+	"github.com/feedhenry/rhm/ui"
 	"github.com/urfave/cli"
 )
 
@@ -52,6 +49,8 @@ type templatesCmd struct {
 	templateName string
 }
 
+var templatesTemplate = "{{range . }} | ID | {{.ID}} | Name | {{.Name}} | Category | {{.Category}} \n\n  {{end}}"
+
 // ListTemplates gets a list of templates of the supplied templateType (e.g. projects)
 func (tc *templatesCmd) templatesAction(ctx *cli.Context) error {
 	var url = "%s/box/api/templates/%s"
@@ -73,50 +72,20 @@ func (tc *templatesCmd) templatesAction(ctx *cli.Context) error {
 	newrequest.AddCookie(&cookie)
 	//do request
 
-	resp, err := tc.getter(newrequest)
+	res, err := tc.getter(newrequest)
 	if err != nil {
 		return cli.NewExitError("could not create new request object "+err.Error(), 1)
 	}
-	defer resp.Body.Close()
+	defer res.Body.Close()
 
-	ret, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return cli.NewExitError("failed to read response body "+err.Error(), 1)
-	}
-
-	//check if not authed)
-	if err := handleTemplatesResponseStatus(resp.StatusCode); err != nil {
-		tc.out.Write(ret)
-		return err
-	}
-
-	var resJSON []*commands.Template
-	if err := json.Unmarshal(ret, &resJSON); err != nil {
-		return cli.NewExitError("failed to decode response :"+err.Error(), 1)
-	}
-
-	if tc.templateID != "" {
-		resJSON, err = filterTemplates(resJSON, tc.templateID, func(template *commands.Template, templateID string) bool {
-			return template.ID == templateID
-		})
-	}
-	if err != nil {
-		return cli.NewExitError("Failed to find template with ID :"+err.Error(), 1)
-	}
-
-	if tc.templateName != "" {
-		resJSON, err = filterTemplates(resJSON, tc.templateName, func(template *commands.Template, templateName string) bool {
-			return strings.Contains(strings.ToLower(template.Name), strings.ToLower(templateName))
-		})
-	}
-	if err != nil {
-		return cli.NewExitError("Failed to find template with Title :"+err.Error(), 1)
-	}
-
-	t := template.New("project templates list template")
-	t, _ = t.Parse("{{range . }} | ID | {{.ID}} | Name | {{.Name}} | Category | {{.Category}} \n\n  {{end}}")
-	if err := t.Execute(tc.out, resJSON); err != nil {
-		return cli.NewExitError("failed to execute template "+err.Error(), 1)
+	op := ui.NewOutPutter(res.Body, tc.out)
+	//handle Output
+	switch ctx.GlobalString("o") {
+	case "json":
+		return op.OutputJSON()
+	default:
+		var templatesModel []*commands.Template
+		return op.OutputTemplate(templatesTemplate, &templatesModel)
 	}
 
 	return nil

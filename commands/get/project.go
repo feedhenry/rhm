@@ -1,21 +1,20 @@
 package get
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
-	"text/template"
 
 	"github.com/feedhenry/rhm/commands"
 	"github.com/feedhenry/rhm/storage"
+	"github.com/feedhenry/rhm/ui"
 	"github.com/urfave/cli"
 )
 
 var projectTemplate = `
-| Title |  {{.Title}} 
-| Email |  {{.AuthorEmail}} 
+| Title |  {{.Title}}
+| Email |  {{.AuthorEmail}}
 | Guid  |  {{.GUID}}
 | Type  |  {{.Type}}
         {{if .Apps}}
@@ -23,9 +22,9 @@ var projectTemplate = `
                 {{range .Apps }}
                | Title | {{.Title}}
                | Guid  | {{.GUID}}
-            
+
                 {{end}}
-        {{end}}        
+        {{end}}
 `
 
 type projectCmd struct {
@@ -76,28 +75,27 @@ func (pc *projectCmd) projectAction(ctx *cli.Context) error {
 		return cli.NewExitError("failed to make request to get project", 1)
 	}
 	defer res.Body.Close()
-	data, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return cli.NewExitError("failed to read response body "+err.Error(), 1)
-	}
 	if res.StatusCode != http.StatusOK {
+		data, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			return cli.NewExitError("failed to read response body "+err.Error(), 1)
+		}
 		pc.out.Write(data)
 		return cli.NewExitError(fmt.Sprintf("\n unexpected response %d \n", res.StatusCode), 1)
 	}
 	projectModel := &commands.Project{}
-	if err := json.Unmarshal(data, projectModel); err != nil {
-		return cli.NewExitError("failed to Unmarshal json "+err.Error(), 1)
+
+	op := ui.NewOutPutter(res.Body, pc.out)
+	//handle Output
+	switch ctx.GlobalString("o") {
+	case "json":
+		return op.OutputJSON()
+	default:
+		return op.OutputTemplate(projectTemplate, projectModel)
 	}
-	t := template.New("project")
-	t, err = t.Parse(projectTemplate)
-	if err != nil {
-		return cli.NewExitError("failed to parse template "+err.Error(), 1)
-	}
-	//template, writer
-	if err := t.Execute(pc.out, projectModel); err != nil {
-		return cli.NewExitError("failed to output template "+err.Error(), 1)
-	}
+
 	return nil
+
 }
 
 // NewProjectCmd configures a new project command
