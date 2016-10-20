@@ -49,7 +49,10 @@ type templatesCmd struct {
 	templateName string
 }
 
-var templatesTemplate = "{{range . }} | ID | {{.ID}} | Name | {{.Name}} | Category | {{.Category}} \n\n  {{end}}"
+var templatesTemplate = `
+| {{PadRight 14 " " "Id"}}| {{PadRight 14 " " "Name"}}| {{PadRight 14 " " "Category"}}|
+|-{{PadRight 14 "-" ""}}+-{{PadRight 14 "-" ""}}+-{{PadRight 14 "-" ""}}|{{range .}}
+| {{PadRight 14 " " .ID}}| {{PadRight 14 " " .Name}}| {{PadRight 14 " " .Category}}|{{end}}`
 
 // ListTemplates gets a list of templates of the supplied templateType (e.g. projects)
 func (tc *templatesCmd) templatesAction(ctx *cli.Context) error {
@@ -77,18 +80,8 @@ func (tc *templatesCmd) templatesAction(ctx *cli.Context) error {
 		return cli.NewExitError("could not create new request object "+err.Error(), 1)
 	}
 	defer res.Body.Close()
-
-	op := ui.NewOutPutter(res.Body, tc.out)
-	//handle Output
-	switch ctx.GlobalString("o") {
-	case "json":
-		return op.OutputJSON()
-	default:
-		var templatesModel []*commands.Template
-		return op.OutputTemplate(templatesTemplate, &templatesModel)
-	}
-
-	return nil
+	var dataStructure []*commands.Template
+	return ui.NewOutPutter(ctx.GlobalString("o"), res.Body, tc.out, templatesTemplate, &dataStructure).Output()
 }
 
 // handleTemplatesResponseStatus checks whether the API request returned an ok response

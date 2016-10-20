@@ -13,18 +13,10 @@ import (
 )
 
 var projectTemplate = `
-| Title |  {{.Title}}
-| Email |  {{.AuthorEmail}}
-| Guid  |  {{.GUID}}
-| Type  |  {{.Type}}
-        {{if .Apps}}
-        | Apps |
-                {{range .Apps }}
-               | Title | {{.Title}}
-               | Guid  | {{.GUID}}
-
-                {{end}}
-        {{end}}
+==== Project Data ====
+| {{PadRight 14 " " "Title"}}| {{PadRight 30 " " "Email"}}| {{PadRight 28 " " "GUID"}}| {{PadRight 14 " " "Type"}}|
++-{{PadRight 14 "-" ""}}+-{{PadRight 30 "-" ""}}+-{{PadRight 28 "-" ""}}+-{{PadRight 14 "-" ""}}+
+| {{PadRight 14 " " .Title}}| {{PadRight 30 " " .AuthorEmail}}| {{PadRight 28 " " .GUID}}| {{PadRight 14 " " .Type}}|
 `
 
 type projectCmd struct {
@@ -83,19 +75,9 @@ func (pc *projectCmd) projectAction(ctx *cli.Context) error {
 		pc.out.Write(data)
 		return cli.NewExitError(fmt.Sprintf("\n unexpected response %d \n", res.StatusCode), 1)
 	}
-	projectModel := &commands.Project{}
 
-	op := ui.NewOutPutter(res.Body, pc.out)
-	//handle Output
-	switch ctx.GlobalString("o") {
-	case "json":
-		return op.OutputJSON()
-	default:
-		return op.OutputTemplate(projectTemplate, projectModel)
-	}
-
-	return nil
-
+	var dataStructure commands.Project
+	return ui.NewOutPutter(ctx.GlobalString("o"), res.Body, pc.out, projectTemplate, &dataStructure).Output()
 }
 
 // NewProjectCmd configures a new project command

@@ -13,7 +13,11 @@ import (
 	"github.com/urfave/cli"
 )
 
-var projectsTemplate = "{{range . }} |  Project | {{.Title}}  | GUID | {{.GUID}} \n\n  {{end}}"
+var projectsTemplate = `
+| {{PadRight 14 " " "Project Name"}}|  {{PadRight 26 " " "GUID"}}|
+|{{PadRight 15 "-" ""}}+{{PadRight 28 "-" ""}}|{{range . }}
+| {{PadRight 14 " " .Title}}|  {{PadRight 26 " " .GUID}}|{{end}}
+`
 
 //projectsCmd constructs the required writer in order to send the response to the right place.
 type projectsCmd struct {
@@ -51,24 +55,13 @@ func (pc *projectsCmd) projectsAction(ctx *cli.Context) error {
 	cookie := http.Cookie{Name: "feedhenry", Value: userData.Auth}
 	newrequest.AddCookie(&cookie)
 	//do request
-	resp, err := pc.getter(newrequest)
+	res, err := pc.getter(newrequest)
 	if err != nil {
 		return cli.NewExitError("could not create new request object "+err.Error(), 1)
 	}
-	op := ui.NewOutPutter(resp.Body, pc.out)
-	//check if not authed)
-	if err := handleProjectsResponseStatus(resp.StatusCode); err != nil {
-		op.OutputJSON()
-		return err
-	}
-	//handle Output
-	var resJSON []*commands.Project
-	switch ctx.GlobalString("o") {
-	case "json":
-		return op.OutputJSON()
-	default:
-		return op.OutputTemplate(projectsTemplate, &resJSON)
-	}
+
+	var dataStructure []*commands.Project
+	return ui.NewOutPutter(ctx.GlobalString("o"), res.Body, pc.out, projectsTemplate, &dataStructure).Output()
 }
 
 func handleProjectsResponseStatus(status int) error {

@@ -5,10 +5,11 @@ import (
 	"strings"
 	"testing"
 
+	"flag"
+
 	"github.com/feedhenry/rhm/storage"
 	"github.com/feedhenry/rhm/test/mock"
 	"github.com/urfave/cli"
-	"flag"
 )
 
 func TestTemplatesAction(t *testing.T) {

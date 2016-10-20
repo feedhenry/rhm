@@ -21,19 +21,10 @@ type environmentsCmd struct {
 	store  storage.Storer
 }
 
-var environmentListTemplate = `
-{{range . }} 
-Id      |  {{ .ID}} 
-Label   |  {{ .Label}} 
-Enabled |  {{ .Enabled}}
-Target  |
-
-  -- Id     | {{ .Target.ID}}
-  -- Label  | {{ .Target.Label}}
-  -- Env    | {{ .Target.Env}}
-
-
-{{end}}        
+var environmentTemplate = `
+| {{PadRight 14 " " "Id"}}| {{PadRight 14 " " "Label"}}| {{PadRight 14 " " "Enabled"}}| {{PadRight 14 " " "Target.id"}}| {{PadRight 14 " " "Target.Label"}}| {{PadRight 14 " " "Target.Env"}}|
+|-{{PadRight 14 "-" ""}}+-{{PadRight 14 "-" ""}}+-{{PadRight 14 "-" ""}}+-{{PadRight 14 "-" ""}}+-{{PadRight 14 "-" ""}}+-{{PadRight 14 "-" ""}}|{{range . }}
+| {{PadRight 14 " " .ID}}| {{PadRight 14 " " .Label}}| {{if .Enabled}}{{PadRight 14 " " "Yes"}}{{else}}{{PadRight 14 " " "No"}}{{end}}| {{PadRight 14 " " .Target.ID}}| {{PadRight 14 " " .Target.Label}}| {{PadRight 14 " " .Target.Env}}|{{end}}
 `
 
 //Environment Defines our cli command including its flags and usage then returns the command to allow a user to do specific operations on environments
@@ -76,16 +67,9 @@ func (ec *environmentsCmd) environmentsAction(ctx *cli.Context) error {
 	}
 	defer res.Body.Close()
 
-	op := ui.NewOutPutter(res.Body, ec.out)
-	//handle Output
-	switch ctx.GlobalString("o") {
-	case "json":
-		return op.OutputJSON()
-	default:
-		var environmentsModel []*commands.Environment
-		return op.OutputTemplate(environmentListTemplate, &environmentsModel)
-	}
-	return nil
+	var dataStructure []*commands.Environment
+	return ui.NewOutPutter(ctx.GlobalString("o"), res.Body, ec.out, environmentTemplate, &dataStructure).Output()
+
 }
 
 // handleEnvironmentsResponseStatus checks whether the API request returned an ok response
