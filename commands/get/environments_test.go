@@ -7,9 +7,15 @@ import (
 
 	"github.com/feedhenry/rhm/storage"
 	"github.com/feedhenry/rhm/test/mock"
+	"github.com/urfave/cli"
+	"flag"
 )
 
+var outPutType string
+
 func TestEnvironmentsAction(t *testing.T) {
+	cxt := cli.NewContext(cli.NewApp(), flag.NewFlagSet("o", 0), nil)
+	cxt.GlobalSet("o", "json")
 	var (
 		mockStore = mock.UserDataStore(storage.NewUserData("test", "test@test.com", "testing.feedhenry.me", "testing"))
 		in        bytes.Buffer
@@ -22,7 +28,7 @@ func TestEnvironmentsAction(t *testing.T) {
 		store:  mockStore,
 		getter: mock.CreateRequest(t, 200, "testing.feedhenry.me/api/v2/environments/all", response),
 	}
-	if err := eCmd.environmentsAction(nil); err != nil {
+	if err := eCmd.environmentsAction(cxt); err != nil {
 		t.Fatal("failed to exectute environments cmd" + err.Error())
 	}
 	content := string(out.Bytes())
@@ -41,6 +47,8 @@ func TestEnvironmentsAction(t *testing.T) {
 }
 
 func TestEnvironmentsAction401Error(t *testing.T) {
+	cxt := cli.NewContext(cli.NewApp(), flag.NewFlagSet("o", 0), nil)
+	cxt.GlobalSet("o", "json")
 	var (
 		mockStore = mock.UserDataStore(storage.NewUserData("test", "test@test.com", "testing.feedhenry.me", "testing"))
 		in        bytes.Buffer
@@ -53,12 +61,14 @@ func TestEnvironmentsAction401Error(t *testing.T) {
 		store:  mockStore,
 		getter: mock.CreateRequest(t, 401, "testing.feedhenry.me/api/v2/environments/all", response),
 	}
-	if err := eCmd.environmentsAction(nil); err == nil {
+	if err := eCmd.environmentsAction(cxt); err == nil {
 		t.Fatal("expected an error executing command")
 	}
 }
 
 func TestProjectsTestEnvironmentsAction401Error(t *testing.T) {
+	cxt := cli.NewContext(cli.NewApp(), flag.NewFlagSet("o", 0), nil)
+	cxt.GlobalSet("o", "json")
 	var (
 		mockStore = mock.UserDataStore(storage.NewUserData("test", "test@test.com", "testing.feedhenry.me", "testing"))
 		in        bytes.Buffer
@@ -71,7 +81,7 @@ func TestProjectsTestEnvironmentsAction401Error(t *testing.T) {
 		store:  mockStore,
 		getter: mock.CreateRequest(t, 500, "testing.feedhenry.me/api/v2/environments/all", response),
 	}
-	if err := eCmd.environmentsAction(nil); err == nil {
+	if err := eCmd.environmentsAction(cxt); err == nil {
 		t.Fatal("expected an error executing command ")
 	}
 }

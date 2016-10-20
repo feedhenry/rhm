@@ -25,6 +25,7 @@ func main() {
 			Name:        "o",
 			Destination: &outPutType,
 			Usage:       "-o=json",
+			Value: 	     "plain",
 		},
 	}
 	//create out data store for local file system
