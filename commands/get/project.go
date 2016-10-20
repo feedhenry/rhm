@@ -19,6 +19,14 @@ var projectTemplate = `
 | {{PadRight 14 " " "Title"}}| {{PadRight 30 " " "Email"}}| {{PadRight 28 " " "GUID"}}| {{PadRight 14 " " "Type"}}|
 +-{{PadRight 14 "-" ""}}+-{{PadRight 30 "-" ""}}+-{{PadRight 28 "-" ""}}+-{{PadRight 14 "-" ""}}+
 | {{PadRight 14 " " .Title}}| {{PadRight 30 " " .AuthorEmail}}| {{PadRight 28 " " .GUID}}| {{PadRight 14 " " .Type}}|
+<<<<<<< 3326b24de7bf12a2999cc8632ad90393f566370e
+=======
+
+==== Apps ====
+| {{PadRight 14 " " "Title"}}| {{PadRight 30 " " "GUID"}}|
++-{{PadRight 14 "-" ""}}+-{{PadRight 30 "-" ""}}|{{range .Apps }}
+| {{PadRight 14 " " .Title}}| {{PadRight 30 " " .GUID}}|{{end}}
+>>>>>>> tidy up plain templates
 `
 
 type projectCmd struct {
