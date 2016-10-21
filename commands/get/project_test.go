@@ -2,11 +2,10 @@ package get
 
 import (
 	"bytes"
+	"errors"
 	"flag"
 	"strings"
 	"testing"
-
-	"errors"
 
 	"github.com/feedhenry/rhm/commands"
 	"github.com/feedhenry/rhm/storage"
@@ -14,7 +13,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-func mockProjectFinder(title string, userData *storage.UserData, getter commands.HTTPGetter) (string, error) {
+func mockProjectActionProjectFinder(title string, userData *storage.UserData, getter commands.HTTPGetter) (string, error) {
 	return "", errors.New("Project not found")
 }
 
@@ -35,7 +34,7 @@ func TestProjectAction(t *testing.T) {
 			store:         mockStore,
 			getter:        getter,
 			project:       "scqswfv56m7fktyijkfw6tkd",
-			projectFinder: mockProjectFinder,
+			projectFinder: mockProjectActionProjectFinder,
 		}
 
 		if err := pCommand.projectAction(ctx); err != nil {
@@ -56,7 +55,7 @@ func TestProjectAction(t *testing.T) {
 			store:         mockStore,
 			getter:        getter,
 			project:       "scqswfv56m7fktyijkfw6tkd",
-			projectFinder: mockProjectFinder,
+			projectFinder: mockProjectActionProjectFinder,
 		}
 		if err := pCommand.projectAction(ctx); err == nil {
 			t.Fatal("expected an error ", err.Error())
@@ -72,7 +71,7 @@ func TestProjectAction(t *testing.T) {
 			store:         mockStore,
 			getter:        getter,
 			project:       "scqswfv56m7fktyijkfw6tkd",
-			projectFinder: mockProjectFinder,
+			projectFinder: mockProjectActionProjectFinder,
 		}
 		if err := pCommand.projectAction(ctx); err == nil {
 			t.Fatal("expected an error ", err.Error())
