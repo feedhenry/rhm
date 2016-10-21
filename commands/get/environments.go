@@ -69,7 +69,6 @@ func (ec *environmentsCmd) environmentsAction(ctx *cli.Context) error {
 
 	var dataStructure []*commands.Environment
 	return ui.NewPrinter(ctx.GlobalString("o"), res.Body, ec.out, environmentTemplate, &dataStructure).Print()
-
 }
 
 // handleEnvironmentsResponseStatus checks whether the API request returned an ok response
