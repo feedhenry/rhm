@@ -68,7 +68,7 @@ func (ec *environmentsCmd) environmentsAction(ctx *cli.Context) error {
 	defer res.Body.Close()
 
 	var dataStructure []*commands.Environment
-	return ui.NewOutPutter(ctx.GlobalString("o"), res.Body, ec.out, environmentTemplate, &dataStructure).Output()
+	return ui.NewPrinter(ctx.GlobalString("o"), res.Body, ec.out, environmentTemplate, &dataStructure).Print()
 
 }
 

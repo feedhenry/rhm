@@ -77,7 +77,7 @@ func (pc *projectCmd) projectAction(ctx *cli.Context) error {
 	}
 
 	var dataStructure commands.Project
-	return ui.NewOutPutter(ctx.GlobalString("o"), res.Body, pc.out, projectTemplate, &dataStructure).Output()
+	return ui.NewPrinter(ctx.GlobalString("o"), res.Body, pc.out, projectTemplate, &dataStructure).Print()
 }
 
 // NewProjectCmd configures a new project command

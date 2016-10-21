@@ -61,7 +61,7 @@ func (pc *projectsCmd) projectsAction(ctx *cli.Context) error {
 	}
 
 	var dataStructure []*commands.Project
-	return ui.NewOutPutter(ctx.GlobalString("o"), res.Body, pc.out, projectsTemplate, &dataStructure).Output()
+	return ui.NewPrinter(ctx.GlobalString("o"), res.Body, pc.out, projectsTemplate, &dataStructure).Print()
 }
 
 func handleProjectsResponseStatus(status int) error {

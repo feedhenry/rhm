@@ -81,7 +81,7 @@ func (tc *templatesCmd) templatesAction(ctx *cli.Context) error {
 	}
 	defer res.Body.Close()
 	var dataStructure []*commands.Template
-	return ui.NewOutPutter(ctx.GlobalString("o"), res.Body, tc.out, templatesTemplate, &dataStructure).Output()
+	return ui.NewPrinter(ctx.GlobalString("o"), res.Body, tc.out, templatesTemplate, &dataStructure).Print()
 }
 
 // handleTemplatesResponseStatus checks whether the API request returned an ok response
