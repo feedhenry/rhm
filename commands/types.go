@@ -30,8 +30,11 @@ type Project struct {
 	Apps           []*App      `json:"apps,omitempty"`
 }
 
-type HttpGetter func(*http.Request) (*http.Response, error)
-type ProjectFinder func(string, *storage.UserData, HttpGetter) (string, error)
+// HTTPGetter accepts a http request and returns the http response
+type HTTPGetter func(*http.Request) (*http.Response, error)
+
+// ProjectFinder takes a project name, user details and a httpGetter and returns the project guid
+type ProjectFinder func(string, *storage.UserData, HTTPGetter) (string, error)
 
 // App defines an app request object
 type App struct {

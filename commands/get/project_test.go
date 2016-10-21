@@ -14,7 +14,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-func mockProjectFinder(title string, userData *storage.UserData, getter commands.HttpGetter) (string, error) {
+func mockProjectFinder(title string, userData *storage.UserData, getter commands.HTTPGetter) (string, error) {
 	return "", errors.New("Project not found")
 }
 
@@ -85,7 +85,7 @@ func TestProjectNameToGuid(t *testing.T) {
 	mockResponse := `[{"guid": "347bkfnjoemm6cunjr2fbb6w", "title": "project_name"}]`
 	getter := mock.CreateRequest(t, 200, "testing.feedhenry.me/box/api/projects", mockResponse)
 
-	guid, err := ProjectNameToGuid("project_name", storage.NewUserData("test", "test@test.com", "testing.feedhenry.me", "testing"), getter)
+	guid, err := ProjectNameToGUID("project_name", storage.NewUserData("test", "test@test.com", "testing.feedhenry.me", "testing"), getter)
 	if err != nil {
 		t.Fatal("unexpected error: " + err.Error())
 	}

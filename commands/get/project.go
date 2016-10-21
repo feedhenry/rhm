@@ -26,7 +26,7 @@ type projectCmd struct {
 	out           io.Writer
 	store         storage.Storer
 	project       string
-	getter        commands.HttpGetter
+	getter        commands.HTTPGetter
 	projectFinder commands.ProjectFinder
 }
 
@@ -94,13 +94,13 @@ func NewProjectCmd(in io.Reader, out io.Writer, store storage.Storer) cli.Comman
 		out:           out,
 		store:         store,
 		getter:        http.DefaultClient.Do,
-		projectFinder: ProjectNameToGuid,
+		projectFinder: ProjectNameToGUID,
 	}
 	return pc.Project()
 }
 
-// ProjectNameToGuid will take a project title as an argument and find it in the core and return the guid for that name
-func ProjectNameToGuid(title string, userData *storage.UserData, getter commands.HttpGetter) (string, error) {
+// ProjectNameToGUID will take a project title as an argument and find it in the core and return the guid for that name
+func ProjectNameToGUID(title string, userData *storage.UserData, getter commands.HTTPGetter) (string, error) {
 	url := "%s/box/api/projects?apps=false"
 	fullURL := fmt.Sprintf(url, userData.Host)
 	newrequest, err := http.NewRequest("GET", fullURL, nil)
