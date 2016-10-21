@@ -93,4 +93,15 @@ func TestProjectNameToGuid(t *testing.T) {
 	if guid != "347bkfnjoemm6cunjr2fbb6w" {
 		t.Fatal("expected guid: 347bkfnjoemm6cunjr2fbb6w got: " + guid)
 	}
+
+	getter = mock.CreateRequest(t, 200, "testing.feedhenry.me/box/api/projects", mockResponse)
+
+	guid, err = ProjectNameToGUID("bad_project_name", storage.NewUserData("test", "test@test.com", "testing.feedhenry.me", "testing"), getter)
+	if err == nil {
+		t.Fatal("expected error got nil")
+	}
+
+	if guid != "" {
+		t.Fatal("expected guid to be empty, got: " + guid)
+	}
 }
