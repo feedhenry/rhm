@@ -1,6 +1,8 @@
 package get
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -20,11 +22,12 @@ var projectTemplate = `
 `
 
 type projectCmd struct {
-	in      io.Reader
-	out     io.Writer
-	store   storage.Storer
-	project string
-	getter  func(*http.Request) (*http.Response, error)
+	in            io.Reader
+	out           io.Writer
+	store         storage.Storer
+	project       string
+	getter        commands.HTTPGetter
+	projectFinder commands.ProjectFinder
 }
 
 func (pc *projectCmd) Project() cli.Command {
@@ -52,7 +55,11 @@ func (pc *projectCmd) projectAction(ctx *cli.Context) error {
 		pc.project = uData.ActiveProject
 	}
 	if pc.project == "" {
-		return cli.NewExitError("expeced a project guid. Use --project", 1)
+		return cli.NewExitError("expeced a project guid or name. Use --project", 1)
+	}
+	guid, err := pc.projectFinder(pc.project, uData, pc.getter)
+	if err == nil {
+		pc.project = guid
 	}
 	url := fmt.Sprintf(urlTemplate, uData.Host, pc.project)
 	newrequest, err := http.NewRequest("GET", url, nil)
@@ -83,10 +90,46 @@ func (pc *projectCmd) projectAction(ctx *cli.Context) error {
 // NewProjectCmd configures a new project command
 func NewProjectCmd(in io.Reader, out io.Writer, store storage.Storer) cli.Command {
 	pc := &projectCmd{
-		in:     in,
-		out:    out,
-		store:  store,
-		getter: http.DefaultClient.Do,
+		in:            in,
+		out:           out,
+		store:         store,
+		getter:        http.DefaultClient.Do,
+		projectFinder: ProjectNameToGUID,
 	}
 	return pc.Project()
+}
+
+// ProjectNameToGUID will take a project title as an argument and find it in the core and return the guid for that name
+func ProjectNameToGUID(title string, userData *storage.UserData, getter commands.HTTPGetter) (string, error) {
+	url := "%s/box/api/projects?apps=false"
+	fullURL := fmt.Sprintf(url, userData.Host)
+	newrequest, err := http.NewRequest("GET", fullURL, nil)
+	if err != nil {
+		return "", cli.NewExitError("could not create new request object "+err.Error(), 1)
+	}
+	// create a cookie
+	cookie := http.Cookie{Name: "feedhenry", Value: userData.Auth}
+	newrequest.AddCookie(&cookie)
+	//do request
+	res, err := getter(newrequest)
+	if err != nil {
+		return "", cli.NewExitError("could not create new request object "+err.Error(), 1)
+	}
+	//check if not authed)
+
+	//handle Output
+	var projects []*commands.Project
+
+	dec := json.NewDecoder(res.Body)
+	if err := dec.Decode(&projects); err != nil {
+		return "", err
+	}
+
+	for _, project := range projects {
+		if project.Title == title {
+			return project.GUID, nil
+		}
+	}
+
+	return "", errors.New("Project with title '" + title + "' not found.")
 }

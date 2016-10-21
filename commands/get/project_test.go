@@ -6,10 +6,17 @@ import (
 	"strings"
 	"testing"
 
+	"errors"
+
+	"github.com/feedhenry/rhm/commands"
 	"github.com/feedhenry/rhm/storage"
 	"github.com/feedhenry/rhm/test/mock"
 	"github.com/urfave/cli"
 )
+
+func mockProjectFinder(title string, userData *storage.UserData, getter commands.HTTPGetter) (string, error) {
+	return "", errors.New("Project not found")
+}
 
 func TestProjectAction(t *testing.T) {
 	var (
@@ -23,11 +30,12 @@ func TestProjectAction(t *testing.T) {
 		mockResponse := `{"title": "cordova-test", "guid": "scqswfv56m7fktyijkfw6tkd"}`
 		getter := mock.CreateRequest(t, 200, "testing.feedhenry.me/box/api/projects/scqswfv56m7fktyijkfw6tkd", mockResponse)
 		pCommand := projectCmd{
-			in:      &in,
-			out:     &out,
-			store:   mockStore,
-			getter:  getter,
-			project: "scqswfv56m7fktyijkfw6tkd",
+			in:            &in,
+			out:           &out,
+			store:         mockStore,
+			getter:        getter,
+			project:       "scqswfv56m7fktyijkfw6tkd",
+			projectFinder: mockProjectFinder,
 		}
 
 		if err := pCommand.projectAction(ctx); err != nil {
@@ -43,11 +51,12 @@ func TestProjectAction(t *testing.T) {
 		mockResponse := `{"status": "error", "message": "unexpected error"}`
 		getter := mock.CreateRequest(t, 500, "testing.feedhenry.me/box/api/projects/scqswfv56m7fktyijkfw6tkd", mockResponse)
 		pCommand := projectCmd{
-			in:      &in,
-			out:     &out,
-			store:   mockStore,
-			getter:  getter,
-			project: "scqswfv56m7fktyijkfw6tkd",
+			in:            &in,
+			out:           &out,
+			store:         mockStore,
+			getter:        getter,
+			project:       "scqswfv56m7fktyijkfw6tkd",
+			projectFinder: mockProjectFinder,
 		}
 		if err := pCommand.projectAction(ctx); err == nil {
 			t.Fatal("expected an error ", err.Error())
@@ -58,15 +67,41 @@ func TestProjectAction(t *testing.T) {
 		mockResponse := `{"status": "error", "message": "unexpected error"}`
 		getter := mock.CreateRequest(t, 401, "testing.feedhenry.me/box/api/projects/scqswfv56m7fktyijkfw6tkd", mockResponse)
 		pCommand := projectCmd{
-			in:      &in,
-			out:     &out,
-			store:   mockStore,
-			getter:  getter,
-			project: "scqswfv56m7fktyijkfw6tkd",
+			in:            &in,
+			out:           &out,
+			store:         mockStore,
+			getter:        getter,
+			project:       "scqswfv56m7fktyijkfw6tkd",
+			projectFinder: mockProjectFinder,
 		}
 		if err := pCommand.projectAction(ctx); err == nil {
 			t.Fatal("expected an error ", err.Error())
 		}
 	})
 
+}
+
+func TestProjectNameToGuid(t *testing.T) {
+	mockResponse := `[{"guid": "347bkfnjoemm6cunjr2fbb6w", "title": "project_name"}]`
+	getter := mock.CreateRequest(t, 200, "testing.feedhenry.me/box/api/projects", mockResponse)
+
+	guid, err := ProjectNameToGUID("project_name", storage.NewUserData("test", "test@test.com", "testing.feedhenry.me", "testing"), getter)
+	if err != nil {
+		t.Fatal("unexpected error: " + err.Error())
+	}
+
+	if guid != "347bkfnjoemm6cunjr2fbb6w" {
+		t.Fatal("expected guid: 347bkfnjoemm6cunjr2fbb6w got: " + guid)
+	}
+
+	getter = mock.CreateRequest(t, 200, "testing.feedhenry.me/box/api/projects", mockResponse)
+
+	guid, err = ProjectNameToGUID("bad_project_name", storage.NewUserData("test", "test@test.com", "testing.feedhenry.me", "testing"), getter)
+	if err == nil {
+		t.Fatal("expected error got nil")
+	}
+
+	if guid != "" {
+		t.Fatal("expected guid to be empty, got: " + guid)
+	}
 }
