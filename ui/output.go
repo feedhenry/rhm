@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// OutPutter handles output types
+// Printer handles output types
 type Printer interface {
 	Print() error
 }
@@ -21,7 +21,7 @@ type JSONPrinter struct {
 	to   io.Writer
 }
 
-// templatePrinter reads from the from source, and sends to the destination. The output is determined by the template and the data is read into the
+// TemplatePrinter reads from the from source, and sends to the destination. The output is determined by the template and the data is read into the
 // dataStructure
 type TemplatePrinter struct {
 	from          io.ReadCloser
@@ -40,7 +40,7 @@ func NewPrinter(format string, from io.ReadCloser, to io.Writer, template string
 	}
 }
 
-// Output outputs raw json from the reader
+// Print outputs raw json from the reader
 func (j *JSONPrinter) Print() error {
 	defer j.from.Close()
 	var dest bytes.Buffer
@@ -55,7 +55,7 @@ func (j *JSONPrinter) Print() error {
 	return err
 }
 
-// Output takes a template string and outputs it based on the data in the reader. It exepects it to be JSON data
+// Print takes a template string and outputs it based on the data in the reader. It exepects it to be JSON data
 func (p TemplatePrinter) Print() error {
 	dec := json.NewDecoder(p.from)
 	if err := dec.Decode(p.dataStructure); err != nil {
