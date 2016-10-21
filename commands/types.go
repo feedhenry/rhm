@@ -1,5 +1,11 @@
 package commands
 
+import (
+	"net/http"
+
+	"github.com/feedhenry/rhm/storage"
+)
+
 // define all the types used in a common file
 
 // Project defines the project response object
@@ -23,6 +29,9 @@ type Project struct {
 	Type           string      `json:"type"`
 	Apps           []*App      `json:"apps,omitempty"`
 }
+
+type HttpGetter func(*http.Request) (*http.Response, error)
+type ProjectFinder func(string, *storage.UserData, HttpGetter) (string, error)
 
 // App defines an app request object
 type App struct {
