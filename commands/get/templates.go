@@ -1,16 +1,13 @@
 package get
 
 import (
-	"encoding/json"
 	"fmt"
-	"html/template"
 	"io"
-	"io/ioutil"
 	"net/http"
-	"strings"
 
 	"github.com/feedhenry/rhm/commands"
 	"github.com/feedhenry/rhm/storage"
+	"github.com/feedhenry/rhm/ui"
 	"github.com/urfave/cli"
 )
 
@@ -52,6 +49,11 @@ type templatesCmd struct {
 	templateName string
 }
 
+var templatesTemplate = `
+| {{PadRight 14 " " "Id"}}| {{PadRight 14 " " "Name"}}| {{PadRight 14 " " "Category"}}|
+|-{{PadRight 14 "-" ""}}+-{{PadRight 14 "-" ""}}+-{{PadRight 14 "-" ""}}|{{range .}}
+| {{PadRight 14 " " .ID}}| {{PadRight 14 " " .Name}}| {{PadRight 14 " " .Category}}|{{end}}`
+
 // ListTemplates gets a list of templates of the supplied templateType (e.g. projects)
 func (tc *templatesCmd) templatesAction(ctx *cli.Context) error {
 	var url = "%s/box/api/templates/%s"
@@ -73,53 +75,13 @@ func (tc *templatesCmd) templatesAction(ctx *cli.Context) error {
 	newrequest.AddCookie(&cookie)
 	//do request
 
-	resp, err := tc.getter(newrequest)
+	res, err := tc.getter(newrequest)
 	if err != nil {
 		return cli.NewExitError("could not create new request object "+err.Error(), 1)
 	}
-	defer resp.Body.Close()
-
-	ret, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return cli.NewExitError("failed to read response body "+err.Error(), 1)
-	}
-
-	//check if not authed)
-	if err := handleTemplatesResponseStatus(resp.StatusCode); err != nil {
-		tc.out.Write(ret)
-		return err
-	}
-
-	var resJSON []*commands.Template
-	if err := json.Unmarshal(ret, &resJSON); err != nil {
-		return cli.NewExitError("failed to decode response :"+err.Error(), 1)
-	}
-
-	if tc.templateID != "" {
-		resJSON, err = filterTemplates(resJSON, tc.templateID, func(template *commands.Template, templateID string) bool {
-			return template.ID == templateID
-		})
-	}
-	if err != nil {
-		return cli.NewExitError("Failed to find template with ID :"+err.Error(), 1)
-	}
-
-	if tc.templateName != "" {
-		resJSON, err = filterTemplates(resJSON, tc.templateName, func(template *commands.Template, templateName string) bool {
-			return strings.Contains(strings.ToLower(template.Name), strings.ToLower(templateName))
-		})
-	}
-	if err != nil {
-		return cli.NewExitError("Failed to find template with Title :"+err.Error(), 1)
-	}
-
-	t := template.New("project templates list template")
-	t, _ = t.Parse("{{range . }} | ID | {{.ID}} | Name | {{.Name}} | Category | {{.Category}} \n\n  {{end}}")
-	if err := t.Execute(tc.out, resJSON); err != nil {
-		return cli.NewExitError("failed to execute template "+err.Error(), 1)
-	}
-
-	return nil
+	defer res.Body.Close()
+	var dataStructure []*commands.Template
+	return ui.NewPrinter(ctx.GlobalString("o"), res.Body, tc.out, templatesTemplate, &dataStructure).Print()
 }
 
 // handleTemplatesResponseStatus checks whether the API request returned an ok response

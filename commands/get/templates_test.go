@@ -5,11 +5,16 @@ import (
 	"strings"
 	"testing"
 
+	"flag"
+
 	"github.com/feedhenry/rhm/storage"
 	"github.com/feedhenry/rhm/test/mock"
+	"github.com/urfave/cli"
 )
 
 func TestTemplatesAction(t *testing.T) {
+	cxt := cli.NewContext(cli.NewApp(), flag.NewFlagSet("o", 0), nil)
+	cxt.GlobalSet("o", "json")
 	var (
 		mockStore = mock.UserDataStore(storage.NewUserData("test", "test@test.com", "testing.feedhenry.me", "testing"))
 		in        bytes.Buffer
@@ -23,7 +28,7 @@ func TestTemplatesAction(t *testing.T) {
 		templateType: "projects",
 		getter:       mock.CreateRequest(t, 200, "testing.feedhenry.me/box/api/templates/projects", response),
 	}
-	if err := tCmd.templatesAction(nil); err != nil {
+	if err := tCmd.templatesAction(cxt); err != nil {
 		t.Fatal("failed to exectute templates cmd" + err.Error())
 	}
 	content := string(out.Bytes())
@@ -39,6 +44,8 @@ func TestTemplatesAction(t *testing.T) {
 }
 
 func TestTemplatesAction401Error(t *testing.T) {
+	cxt := cli.NewContext(cli.NewApp(), flag.NewFlagSet("o", 0), nil)
+	cxt.GlobalSet("o", "json")
 	var (
 		mockStore = mock.UserDataStore(storage.NewUserData("test", "test@test.com", "testing.feedhenry.me", "testing"))
 		in        bytes.Buffer
@@ -52,12 +59,14 @@ func TestTemplatesAction401Error(t *testing.T) {
 		templateType: "projects",
 		getter:       mock.CreateRequest(t, 401, "testing.feedhenry.me/box/api/templates/projects", response),
 	}
-	if err := tCmd.templatesAction(nil); err == nil {
+	if err := tCmd.templatesAction(cxt); err == nil {
 		t.Fatal("expected an error executing command")
 	}
 }
 
 func TestTemplatesAction500Error(t *testing.T) {
+	cxt := cli.NewContext(cli.NewApp(), flag.NewFlagSet("o", 0), nil)
+	cxt.GlobalSet("o", "json")
 	var (
 		mockStore = mock.UserDataStore(storage.NewUserData("test", "test@test.com", "testing.feedhenry.me", "testing"))
 		in        bytes.Buffer
@@ -71,7 +80,7 @@ func TestTemplatesAction500Error(t *testing.T) {
 		templateType: "projects",
 		getter:       mock.CreateRequest(t, 500, "testing.feedhenry.me/box/api/templates/projects", response),
 	}
-	if err := tCmd.templatesAction(nil); err == nil {
+	if err := tCmd.templatesAction(cxt); err == nil {
 		t.Fatal("expected an error executing command ")
 	}
 }

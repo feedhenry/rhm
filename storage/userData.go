@@ -47,7 +47,7 @@ func (ud *UserData) Validate() error {
 
 const (
 	//StorageDefaultLocation The default file for storing user data
-	StorageDefaultLocation = "/.rhm"
+	StorageDefaultLocation = "/.rhm.cfg"
 )
 
 func getHomeDir() (string, error) {

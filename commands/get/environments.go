@@ -3,15 +3,13 @@ package get
 //handle the environments list for rhmap.
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
-	"text/template"
 
 	"github.com/feedhenry/rhm/commands"
 	"github.com/feedhenry/rhm/storage"
+	"github.com/feedhenry/rhm/ui"
 	"github.com/urfave/cli"
 )
 
@@ -23,19 +21,10 @@ type environmentsCmd struct {
 	store  storage.Storer
 }
 
-var environmentListTemplate = `
-{{range . }} 
-Id      |  {{ .ID}} 
-Label   |  {{ .Label}} 
-Enabled |  {{ .Enabled}}
-Target  |
-
-  -- Id     | {{ .Target.ID}}
-  -- Label  | {{ .Target.Label}}
-  -- Env    | {{ .Target.Env}}
-
-
-{{end}}        
+var environmentTemplate = `
+| {{PadRight 14 " " "Id"}}| {{PadRight 14 " " "Label"}}| {{PadRight 14 " " "Enabled"}}| {{PadRight 14 " " "Target.id"}}| {{PadRight 14 " " "Target.Label"}}| {{PadRight 14 " " "Target.Env"}}|
+|-{{PadRight 14 "-" ""}}+-{{PadRight 14 "-" ""}}+-{{PadRight 14 "-" ""}}+-{{PadRight 14 "-" ""}}+-{{PadRight 14 "-" ""}}+-{{PadRight 14 "-" ""}}|{{range . }}
+| {{PadRight 14 " " .ID}}| {{PadRight 14 " " .Label}}| {{if .Enabled}}{{PadRight 14 " " "Yes"}}{{else}}{{PadRight 14 " " "No"}}{{end}}| {{PadRight 14 " " .Target.ID}}| {{PadRight 14 " " .Target.Label}}| {{PadRight 14 " " .Target.Env}}|{{end}}
 `
 
 //Environment Defines our cli command including its flags and usage then returns the command to allow a user to do specific operations on environments
@@ -72,33 +61,15 @@ func (ec *environmentsCmd) environmentsAction(ctx *cli.Context) error {
 	newrequest.AddCookie(&cookie)
 
 	// do request
-	resp, err := ec.getter(newrequest)
+	res, err := ec.getter(newrequest)
 	if err != nil {
 		return cli.NewExitError("could not create new request object "+err.Error(), 1)
 	}
-	defer resp.Body.Close()
-	ret, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return cli.NewExitError("failed to read response body "+err.Error(), 1)
-	}
-	// check if not authed)
-	if err := handleEnvironmentsResponseStatus(resp.StatusCode); err != nil {
-		ec.out.Write(ret)
-		return err
-	}
+	defer res.Body.Close()
 
-	var resJSON []*commands.Environment
-	if err := json.Unmarshal(ret, &resJSON); err != nil {
-		return cli.NewExitError("failed to decode response :"+err.Error(), 1)
-	}
+	var dataStructure []*commands.Environment
+	return ui.NewPrinter(ctx.GlobalString("o"), res.Body, ec.out, environmentTemplate, &dataStructure).Print()
 
-	t := template.New("Environments")
-	t, err = t.Parse(environmentListTemplate)
-	if err := t.Execute(ec.out, resJSON); err != nil {
-		return cli.NewExitError("failed to execute template "+err.Error(), 1)
-	}
-
-	return nil
 }
 
 // handleEnvironmentsResponseStatus checks whether the API request returned an ok response
