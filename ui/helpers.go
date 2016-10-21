@@ -17,6 +17,7 @@ func WaitForAnswer(question string, out io.Writer, in io.Reader) (string, error)
 	return scanner.Text(), nil
 }
 
+// PadRight takes a string and appends the pad character to the right of it, until it is as long as length
 func PadRight(length int, pad, str string) string {
 	for i := len(str); i < length; i += len(pad) {
 		str += pad
@@ -24,6 +25,7 @@ func PadRight(length int, pad, str string) string {
 	return str
 }
 
+// PadLeft takes a string and appends the pad character to the left of it, until it is as long as length
 func PadLeft(length int, pad, str string) string {
 	for i := len(str); i < length; i += len(pad) {
 		str = pad + str
@@ -31,6 +33,7 @@ func PadLeft(length int, pad, str string) string {
 	return str
 }
 
+// PadCentered takes a string and appends the pad character to the left and right of it, until it is as long as length
 func PadCentered(length int, pad, str string) string {
 	for i := len(str); i < length; i += len(pad) {
 		if i%2 == 0 {

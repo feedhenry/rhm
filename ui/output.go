@@ -15,17 +15,21 @@ type OutPutter interface {
 	Output() error
 }
 
+// Throughput reads from the from source, and sends to the to destination
 type Throughput struct {
 	from io.ReadCloser
 	to   io.Writer
 }
 
-type JsonOutPutter struct {
+// JSONThroughputter reads from the from source and sends to the to destination in JSON encoding
+type JSONThroughputter struct {
 	Throughput
 	pretty bool
 }
 
-type PlainOutPutter struct {
+// PlainThroughputter reads from the from source, and sends to the destination. The output is determined by the template and the data is read into the
+// dataStructure
+type PlainThroughputter struct {
 	Throughput
 	template      string
 	dataStructure interface{}
@@ -35,19 +39,19 @@ type PlainOutPutter struct {
 func NewOutPutter(format string, from io.ReadCloser, to io.Writer, template string, dataStructure interface{}) OutPutter {
 	switch strings.ToLower(format) {
 	case "json":
-		return &JsonOutPutter{Throughput: Throughput{from: from, to: to}, pretty: true}
+		return &JSONThroughputter{Throughput: Throughput{from: from, to: to}, pretty: true}
 	default:
-		return &PlainOutPutter{Throughput: Throughput{from: from, to: to}, template: template, dataStructure: dataStructure}
+		return &PlainThroughputter{Throughput: Throughput{from: from, to: to}, template: template, dataStructure: dataStructure}
 	}
 }
 
 // PrettyPrint enables or disables pretty json output
-func (j *JsonOutPutter) PrettyPrint(enabled bool) {
+func (j *JSONThroughputter) PrettyPrint(enabled bool) {
 	j.pretty = enabled
 }
 
 // Output outputs raw json from the reader
-func (j *JsonOutPutter) Output() error {
+func (j *JSONThroughputter) Output() error {
 	defer j.from.Close()
 	var dest bytes.Buffer
 	data, err := ioutil.ReadAll(j.from)
@@ -63,8 +67,8 @@ func (j *JsonOutPutter) Output() error {
 	return err
 }
 
-// OutputTemplate takes a template string and outputs it based on the data in the reader. It exepects it to be JSON data
-func (p PlainOutPutter) Output() error {
+// Output takes a template string and outputs it based on the data in the reader. It exepects it to be JSON data
+func (p PlainThroughputter) Output() error {
 	dec := json.NewDecoder(p.from)
 	if err := dec.Decode(p.dataStructure); err != nil {
 		fmt.Println(err)
