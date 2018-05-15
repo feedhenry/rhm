@@ -1,3 +1,6 @@
+## Deprecation Notice
+This repository has been deprecated and is not being maintained. It should not be used. If you have any questions, please get in touch with the collaborators.
+
 ## RHM is poc / experimental cli for feedhenry written in go. This is not for production use and is being used along with the [Golang intro](https://github.com/fheng/golang-intro)
 
 
